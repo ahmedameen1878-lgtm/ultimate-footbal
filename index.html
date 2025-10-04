@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Football Moments</title>
+<title>Ultimate Football Moments ⚡</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,21 +11,32 @@
 <div class="shape s1" aria-hidden="true"></div>
 <div class="shape s2" aria-hidden="true"></div>
 
+<!-- SPLASH -->
 <div id="splash" role="dialog" aria-live="polite">
-  <div class="splash-card" aria-hidden="false">
+  <div class="splash-card">
     <div class="splash-title">
       <span class="splash-emoji">⚡</span>
       <span>أهلاً بك في Ultimate Football Moments!</span>
       <span class="splash-emoji">⚽</span>
     </div>
     <div class="splash-sub">
-      استعد لتجربة كرة قدم لا تُنسى! استمتع بمتابعة الدوريات المختلفة مع جدول مباريات حي ومؤثرات بصرية ممتعة!
+      استعد لتجربة كرة قدم لا تُنسى! استمتع بمتابعة الدوريات المختلفة مع جدول مباريات حي ومؤثرات بصرية ممتعة! شاهد كل تفاصيل الدوريات المفضلة لديك الآن!
     </div>
     <div class="hint" id="skip-btn">اضغط للتخطي</div>
-    <button id="request-location-btn" class="hint">مشاركة موقعي الآن</button>
   </div>
 </div>
 
+<!-- LOCATION MESSAGE -->
+<div id="location-msg">
+  <h2>خطوات تفعيل إذن الموقع</h2>
+  <p>انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة.</p>
+  <div>
+    <button id="grant-btn">منح الإذن</button>
+    <button id="retry-btn">إعادة المحاولة</button>
+  </div>
+</div>
+
+<!-- MATCH TABLE -->
 <div id="match-table">
   <div id="leagues"></div>
 </div>
