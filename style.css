@@ -1,6 +1,6 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter, system-ui, "Segoe UI", Roboto, Arial}
 html,body{height:100%;}
-body{background:#0b0b0d;color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-direction:column;}
+body{background:#0b0b0d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;}
 
 /* SPLASH */
 #splash{
@@ -20,7 +20,6 @@ body{background:#0b0b0d;color:#fff;display:flex;align-items:center;justify-conte
 .splash-emoji{font-size:1.4rem;transform:translateY(-2px);}
 .splash-sub{color:#cbd8ff;opacity:.95;margin-top:8px;}
 .hint{margin-top:18px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));font-size:.85rem;color:rgba(255,255,255,0.9);cursor:pointer;}
-
 @keyframes floatText{
   0%{transform: translateY(-3px);}
   50%{transform: translateY(3px);}
@@ -29,8 +28,8 @@ body{background:#0b0b0d;color:#fff;display:flex;align-items:center;justify-conte
 
 /* subtle animated shapes */
 .shape{position:absolute;border-radius:50%;opacity:.06;filter:blur(18px);}
-.shape.s1{width:260px;height:260px;background:linear-gradient(90deg,#4facfe,#00f2fe);}
-.shape.s2{width:180px;height:180px;background:linear-gradient(90deg,#ff7ab6,#ffc371);}
+.shape.s1{width:260px;height:260px;background:linear-gradient(90deg,#4facfe,#00f2fe);left:-60px;top:30px;transform:rotate(12deg);}
+.shape.s2{width:180px;height:180px;background:linear-gradient(90deg,#ff7ab6,#ffc371);right:-30px;bottom:40px;transform:rotate(-8deg);}
 
 /* جدول المباريات */
 #match-table{margin-top:20px;width:90%;max-width:900px;overflow-y:auto;max-height:70vh;scroll-behavior:smooth;}
@@ -38,3 +37,4 @@ body{background:#0b0b0d;color:#fff;display:flex;align-items:center;justify-conte
 .league-title{font-weight:800;font-size:1.2rem;margin-bottom:12px;color:#4facfe;}
 .match-card{background:rgba(255,255,255,0.05);padding:12px 18px;margin-bottom:8px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;transform:translateX(-100%);opacity:0;transition:transform .5s ease,opacity .5s ease;}
 .match-card.visible{transform:translateX(0);opacity:1;}
+.match-ball{margin-left:10px;}
